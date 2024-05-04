@@ -37,6 +37,20 @@ This Python script checks the availability of a website and sends a notification
 - Ensure you have a valid Discord bot token and channel ID.
 - Make sure the `WEBSITE_URL` environment variable is set to the website you want to monitor.
 
+## CRON
+To set up a cron job that runs every 5 minutes between 7:00 AM and 11:59 PM (23:59), you can use the following cron expression:
+
+```bash
+*/5 6-1 * * * <python> <app.py>
+```
+
+Here's what each part of the cron expression means:
+
+    */5: Run every 5 minutes.
+    6-1: Run between the hours of 7 (7:00 AM) and 23 (11:00 PM).
+    * * *: Run on every day of the month, every month, and every day of the week.
+    <python> <app.py>: Path to your Python interpreter followed by the path to your Python script.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
