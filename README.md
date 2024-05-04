@@ -15,14 +15,14 @@ This Python script checks the availability of a website and sends a notification
     pip install -r requirements.txt
     ```
 
-2. Set up environment variables:
+2. Rename `.env_example` to `.env` and set up environment variables:
     - `WEBSITE_URL`: The URL of the website to monitor.
     - `DISCORD_TOKEN`: The token for your Discord bot.
     - `DISCORD_CHANNEL_ID`: The ID of the Discord channel where notifications will be sent.
 
 3. Run the script:
     ```bash
-    python website_checker.py
+    python app.py
     ```
 
 ## Requirements
