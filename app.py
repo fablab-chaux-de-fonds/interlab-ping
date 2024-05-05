@@ -2,6 +2,8 @@ import os
 import requests
 
 from dotenv import load_dotenv
+
+os.chdir(os.path.dirname(__file__))
 load_dotenv()
 
 WEBSITE_STATE_FILENAME = "website_state.txt"
