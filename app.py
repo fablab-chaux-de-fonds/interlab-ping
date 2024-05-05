@@ -1,7 +1,5 @@
 import os
 import requests
-import discord
-from discord import Intents
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -29,35 +27,28 @@ def check_website(url):
         return False
 
 # Function to send message to Discord server
-async def send_discord_message(token, channel_id, message):
+def send_discord_webhook(webhook_url, message):
     """
-    Sends a message to a Discord channel using the provided token, channel ID, and message.
+    Sends a message to a Discord webhook.
 
     Parameters:
-        token (str): The token used to authenticate with the Discord API.
-        channel_id (int): The ID of the Discord channel to send the message to.
+        webhook_url (str): The URL of the Discord webhook.
         message (str): The content of the message to send.
 
     Returns:
-        None
-
-    Raises:
-        None
+        bool: True if the message was sent successfully, False otherwise.
     """
-    intents = Intents.default()
-    intents.messages = True
-    client = discord.Client(intents=intents)
-    
-    @client.event
-    async def on_ready():
-        channel = client.get_channel(channel_id)
-        if channel:
-            await channel.send(message)
+    try:
+        response = requests.post(webhook_url, json={"content": message})
+        if response.status_code == 204:
+            print("Message sent successfully!")
+            return True
         else:
-            print("Failed to find channel with ID:", channel_id)
-        await client.close()
-
-    await client.start(token)
+            print("Failed to send message:", response.text)
+            return False
+    except Exception as e:
+        print("An error occurred:", e)
+        return False
 
 # Function to read previous state from file
 def read_previous_state():
@@ -75,10 +66,35 @@ def write_current_state(current_state):
         file.write(current_state)
 
 # Main function
-async def main():
+def main():
+    """
+    The main function of the program.
+
+    This function checks the availability of a website and sends a notification to a Discord channel if the website status changes.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    Side Effects:
+        - Sends a notification message to a Discord channel if the website status changes.
+        - Writes the current state of the website to a file.
+
+    Environment Variables:
+        - WEBSITE_URL: The URL of the website to monitor.
+        - DISCORD_WEBHOOK: The webhook URL for the Discord channel where notifications will be sent.
+
+    File I/O:
+        - Reads the previous state of the website from a file.
+        - Writes the current state of the website to a file.
+
+    Exceptions:
+        - FileNotFoundError: If the file containing the previous state does not exist.
+    """
     website_url = os.getenv('WEBSITE_URL')
-    discord_token = os.getenv('DISCORD_TOKEN')
-    discord_channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
+    discord_webhook = os.getenv('DISCORD_WEBHOOK')
     offline_message = f"The website {website_url} is currently offline!"
     online_message = f"The website {website_url} is now online."
 
@@ -88,15 +104,14 @@ async def main():
     # Check if state has changed
     if current_state != previous_state:
         if current_state == "offline":
-            await send_discord_message(discord_token, discord_channel_id, offline_message)
+            send_discord_webhook(discord_webhook, offline_message)
             print("Sent offline message to Discord server")
         else:
-            await send_discord_message(discord_token, discord_channel_id, online_message)
+            send_discord_webhook(discord_webhook, online_message)
             print("Sent online message to Discord server")
         
         write_current_state(current_state)
 
 # Run the main function
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    main()
